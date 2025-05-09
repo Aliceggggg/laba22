@@ -1,0 +1,28 @@
+#include "bin2.h"
+#include <windows.h>
+
+int main() {
+    SetConsoleOutputCP(CP_UTF8);
+    setlocale(LC_ALL, "Russian");
+    string filename = "filename.txt"; 
+    TreeNode* root = buildExpressionTree(filename);
+    if (!root) return 1;
+
+    cout << "Исходное дерево (симметричный обход):\n";
+    inOrderTraversal(root);
+    cout << endl;
+
+    cout << "Дерево в скобочном формате:\n";
+    cout << treeToBracketFormat(root) << endl;
+
+    root = simplifyTree(root);
+
+    cout << "Упрощённое дерево:\n";
+    inOrderTraversal(root);
+    cout << endl;
+
+    cout << "Дерево в скобочном формате после упрощения:\n";
+    cout << treeToBracketFormat(root) << endl;
+
+    cout << "Корень дерева: " << root << endl;
+}
