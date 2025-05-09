@@ -1,0 +1,76 @@
+#include "bin2.h"
+
+
+TreeNode::TreeNode(int val) : value(val), left(nullptr), right(nullptr) {}
+
+TreeNode* buildExpressionTree(const string& filename) {
+    ifstream file(filename);
+    if (!file) {
+        cout << "Ошибка: не удалось открыть файл!\n";
+        return nullptr;
+    }
+
+    stack<TreeNode*> st;
+    string token;
+
+    while (file >> token) {
+        if (isdigit(token[0])) {  
+            st.push(new TreeNode(stoi(token)));
+        }
+        else {  
+            TreeNode* right = st.top(); st.pop();
+            TreeNode* left = st.top(); st.pop();
+
+            int opCode = (token == "+") ? -1 : (token == "-") ? -2 : -3;
+            TreeNode* node = new TreeNode(opCode);
+            node->left = left;
+            node->right = right;
+            st.push(node);
+        }
+    }
+
+    file.close();
+    return st.top(); 
+}
+
+TreeNode* simplifyTree(TreeNode* root) {
+    if (!root) return nullptr;
+
+    root->left = simplifyTree(root->left);
+    root->right = simplifyTree(root->right);
+
+    if (root->value == -2) { 
+        int newValue = root->left->value - root->right->value;
+        delete root;
+        return new TreeNode(newValue);
+    }
+
+    return root;
+}
+
+void inOrderTraversal(TreeNode* root) {
+    if (!root) return;
+    inOrderTraversal(root->left);
+    cout << root->value << " ";
+    inOrderTraversal(root->right);
+}
+
+string treeToBracketFormat(TreeNode* root) {
+    if (!root) return "";
+
+    if (!root->left && !root->right) {
+        return to_string(root->value); 
+    }
+
+    string leftExpr = treeToBracketFormat(root->left);
+    string rightExpr = treeToBracketFormat(root->right);
+
+    string opSymbol;
+    switch (root->value) {
+    case -1: opSymbol = "+"; break;
+    case -2: opSymbol = "-"; break;
+    case -3: opSymbol = "*"; break;
+    }
+
+    return "(" + leftExpr + " " + opSymbol + " " + rightExpr + ")";
+}
